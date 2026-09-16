@@ -13,6 +13,10 @@
 
   <style>
 
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #f3f5f8;
@@ -32,21 +36,60 @@
 
     h1 {
       color: #0b2343;
-      margin-bottom: 5px;
-      font-size: 36px;
+      margin: 5px 0;
+      font-size: 38px;
     }
 
     h2 {
       color: #b51f2e;
-      margin-top: 0;
-      font-size: 20px;
+      margin: 0 0 10px;
+      font-size: 21px;
     }
 
     .subtitulo {
       color: #555;
-      margin-bottom: 20px;
-      font-size: 18px;
+      margin-bottom: 25px;
+      font-size: 19px;
     }
+
+    /* ENTRADA Y SALIDA */
+
+    .botonesMovimiento {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .btnMovimiento {
+      flex: 1;
+      padding: 18px 5px;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #btnEntrada {
+      background: #198754;
+    }
+
+    #btnSalida {
+      background: #dc3545;
+    }
+
+    .seleccionado {
+      outline: 5px solid #ffc107;
+    }
+
+    #movimientoActual {
+      margin: 18px 0;
+      font-size: 18px;
+      color: #555;
+    }
+
+    /* BOTÓN DE CÁMARA */
 
     #btnCamara {
       width: 100%;
@@ -61,15 +104,21 @@
       margin-bottom: 15px;
     }
 
+    /* LECTOR */
+
     #reader {
       width: 100%;
       margin-top: 10px;
+      border-radius: 12px;
+      overflow: hidden;
     }
+
+    /* RESULTADO */
 
     #resultado {
       display: none;
       margin-top: 20px;
-      padding: 18px;
+      padding: 20px;
       border-radius: 12px;
       background: #d1e7dd;
       color: #0f5132;
@@ -81,45 +130,14 @@
     }
 
     .matricula {
-      margin-top: 10px;
-      font-size: 25px;
+      margin-top: 12px;
+      font-size: 21px;
       font-weight: bold;
       color: #0b2343;
       word-break: break-word;
+      line-height: 1.35;
     }
-.botonesMovimiento {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 15px;
-}
 
-.btnMovimiento {
-  flex: 1;
-  padding: 18px 8px;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.entrada {
-  background: #198754;
-}
-
-.salida {
-  background: #dc3545;
-}
-
-.seleccionado {
-  outline: 5px solid #ffc107;
-}
-
-#movimientoActual {
-  margin-bottom: 18px;
-  font-size: 17px;
-  color: #555;
-}
   </style>
 </head>
 
@@ -138,40 +156,58 @@
     Control de Acceso QR
   </div>
 
-  <button id="btnCamara"
-          onclick="iniciarCamara()">
-    <div class="botonesMovimiento">
 
-  <button id="btnEntrada"
-          class="btnMovimiento entrada"
-          onclick="seleccionarMovimiento('ENTRADA')">
-    ENTRADA
-  </button>
+  <!-- ENTRADA / SALIDA -->
 
-  <button id="btnSalida"
-          class="btnMovimiento salida"
-          onclick="seleccionarMovimiento('SALIDA')">
-    SALIDA
-  </button>
+  <div class="botonesMovimiento">
 
-</div>
+    <button
+      id="btnEntrada"
+      class="btnMovimiento"
+      onclick="seleccionarMovimiento('ENTRADA')">
+      ENTRADA
+    </button>
 
-<div id="movimientoActual">
-  Seleccione ENTRADA o SALIDA
-</div>
+    <button
+      id="btnSalida"
+      class="btnMovimiento"
+      onclick="seleccionarMovimiento('SALIDA')">
+      SALIDA
+    </button>
+
+  </div>
+
+
+  <div id="movimientoActual">
+    Seleccione ENTRADA o SALIDA
+  </div>
+
+
+  <!-- ACTIVAR CÁMARA -->
+
+  <button
+    id="btnCamara"
+    onclick="iniciarCamara()">
     📷 ACTIVAR LECTOR QR
   </button>
 
+
+  <!-- LECTOR QR -->
+
   <div id="reader"></div>
+
+
+  <!-- RESULTADO -->
 
   <div id="resultado">
 
     <div class="tituloResultado">
-      ✓ CÓDIGO QR LEÍDO
+      ✓ REGISTRO PROCESADO
     </div>
 
-    <div id="matriculaLeida"
-         class="matricula">
+    <div
+      id="matriculaLeida"
+      class="matricula">
     </div>
 
   </div>
@@ -184,133 +220,196 @@
   let lector = null;
   let codigoProcesado = false;
   let movimientoSeleccionado = '';
-const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyQHiSP-r_D_XFUjzUAEMwf4JDITjgvGlfJaajZXz59it62HJdUl4GNxjc2TjxfH0clJw/exec';
+
+  const URL_APPS_SCRIPT =
+    'https://script.google.com/macros/s/AKfycbyQHiSP-r_D_XFUjzUAEMwf4JDITjgvGlfJaajZXz59it62HJdUl4GNxjc2TjxfH0clJw/exec';
+
 
   function seleccionarMovimiento(tipo) {
 
-  movimientoSeleccionado = tipo;
+    movimientoSeleccionado = tipo;
 
-  document.getElementById('btnEntrada')
-    .classList.remove('seleccionado');
+    document
+      .getElementById('btnEntrada')
+      .classList.remove('seleccionado');
 
-  document.getElementById('btnSalida')
-    .classList.remove('seleccionado');
+    document
+      .getElementById('btnSalida')
+      .classList.remove('seleccionado');
 
-  if (tipo === 'ENTRADA') {
-    document.getElementById('btnEntrada')
-      .classList.add('seleccionado');
-  } else {
-    document.getElementById('btnSalida')
-      .classList.add('seleccionado');
+
+    if (tipo === 'ENTRADA') {
+
+      document
+        .getElementById('btnEntrada')
+        .classList.add('seleccionado');
+
+    } else {
+
+      document
+        .getElementById('btnSalida')
+        .classList.add('seleccionado');
+    }
+
+
+    document
+      .getElementById('movimientoActual')
+      .innerHTML =
+        'Movimiento seleccionado: <strong>' +
+        tipo +
+        '</strong>';
   }
 
-  document.getElementById('movimientoActual')
-    .innerHTML =
-      'Movimiento seleccionado: <strong>' +
-      tipo +
-      '</strong>';
-}
-  
+
+
   function iniciarCamara() {
 
-if (!movimientoSeleccionado) {
-  alert('Primero seleccione ENTRADA o SALIDA.');
-  return;
-}
-    
+    if (!movimientoSeleccionado) {
+
+      alert(
+        'Primero seleccione ENTRADA o SALIDA.'
+      );
+
+      return;
+    }
+
+
     codigoProcesado = false;
 
-    document.getElementById('resultado').style.display = 'none';
+    document
+      .getElementById('resultado')
+      .style.display = 'none';
+
 
     if (!lector) {
       lector = new Html5Qrcode("reader");
     }
 
+
     lector.start(
+
       {
         facingMode: "environment"
       },
+
       {
         fps: 10,
+
         qrbox: {
           width: 250,
           height: 250
         }
       },
 
-     async function(codigo) {
 
-  if (codigoProcesado) {
-    return;
-  }
+      async function(codigo) {
 
-  codigoProcesado = true;
+        if (codigoProcesado) {
+          return;
+        }
 
-  const matricula =
-    String(codigo)
-      .trim()
-      .toUpperCase();
+        codigoProcesado = true;
 
-  // Por ahora probaremos únicamente ENTRADA.
-  const movimiento = movimientoSeleccionado;
 
-  document.getElementById('matriculaLeida')
-    .textContent =
-      'Procesando: ' + matricula;
+        const matricula =
+          String(codigo)
+            .trim()
+            .toUpperCase();
 
-  document.getElementById('resultado')
-    .style.display = 'block';
 
-  try {
+        const movimiento =
+          movimientoSeleccionado;
 
-    const url =
-      URL_APPS_SCRIPT +
-      '?matricula=' +
-      encodeURIComponent(matricula) +
-      '&movimiento=' +
-      encodeURIComponent(movimiento);
 
-    const respuesta = await fetch(url);
+        document
+          .getElementById('matriculaLeida')
+          .textContent =
+            'Procesando: ' + matricula;
 
-    const datos = await respuesta.json();
 
-    if (datos.ok) {
+        document
+          .getElementById('resultado')
+          .style.display = 'block';
 
-      document.getElementById('matriculaLeida')
-        .innerHTML =
-          datos.nombre +
-          '<br><br>' +
-          'Grupo: ' + datos.grupo +
-          '<br>' +
-          datos.fecha + ' · ' + datos.hora +
-          '<br><br>' +
-          '✓ ' + datos.movimiento + ' REGISTRADA';;
 
-    } else {
+        try {
 
-      document.getElementById('matriculaLeida')
-        .innerHTML =
-          '⚠ ' + datos.mensaje;
+          const url =
+            URL_APPS_SCRIPT +
+            '?matricula=' +
+            encodeURIComponent(matricula) +
+            '&movimiento=' +
+            encodeURIComponent(movimiento);
 
-    }
 
-  } catch (error) {
+          const respuesta =
+            await fetch(url);
 
-    document.getElementById('matriculaLeida')
-      .innerHTML =
-        '⚠ Error de comunicación con el sistema.';
 
-    console.error(error);
-  }
+          const datos =
+            await respuesta.json();
 
-  lector.stop()
-    .catch(function() {});
 
-},
+          if (datos.ok) {
+
+            document
+              .getElementById('matriculaLeida')
+              .innerHTML =
+
+                datos.nombre +
+
+                '<br><br>' +
+
+                'Grupo: ' +
+                datos.grupo +
+
+                '<br>' +
+
+                datos.fecha +
+                ' · ' +
+                datos.hora +
+
+                '<br><br>' +
+
+                '✓ ' +
+                datos.movimiento +
+                ' REGISTRADA';
+
+
+          } else {
+
+            document
+              .getElementById('matriculaLeida')
+              .innerHTML =
+                '⚠ ' +
+                datos.mensaje;
+          }
+
+
+        } catch (error) {
+
+          document
+            .getElementById('matriculaLeida')
+            .innerHTML =
+              '⚠ Error de comunicación con el sistema.';
+
+          console.error(error);
+        }
+
+
+        lector.stop()
+          .catch(function() {});
+
+      },
+
 
       function() {
-        // Continúa buscando un QR.
+
+        // El lector continúa buscando
+        // hasta encontrar un QR.
+
       }
+
     )
 
     .catch(function(error) {
@@ -327,4 +426,5 @@ if (!movimientoSeleccionado) {
 </script>
 
 </body>
+
 </html>
