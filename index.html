@@ -1,14 +1,202 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
   <title>Control de Acceso QR - COBACH 234</title>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f5f8;
+      margin: 0;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .contenedor {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 22px;
+      border-radius: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.15);
+    }
+
+    h1 {
+      color: #0b2343;
+      margin-bottom: 5px;
+      font-size: 36px;
+    }
+
+    h2 {
+      color: #b51f2e;
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .subtitulo {
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+
+    #btnCamara {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #0b2343;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    #reader {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    #resultado {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .tituloResultado {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .matricula {
+      margin-top: 10px;
+      font-size: 25px;
+      font-weight: bold;
+      color: #0b2343;
+      word-break: break-word;
+    }
+
+  </style>
 </head>
 
+
 <body>
-  <h1>COBACH Plantel 234</h1>
-  <h2>Control de Acceso QR</h2>
-  <p>Sistema en preparación</p>
+
+<div class="contenedor">
+
+  <h1>COBACH</h1>
+
+  <h2>
+    Plantel 234 · Tuxtla Plan de Ayala
+  </h2>
+
+  <div class="subtitulo">
+    Control de Acceso QR
+  </div>
+
+  <button id="btnCamara"
+          onclick="iniciarCamara()">
+    📷 ACTIVAR LECTOR QR
+  </button>
+
+  <div id="reader"></div>
+
+  <div id="resultado">
+
+    <div class="tituloResultado">
+      ✓ CÓDIGO QR LEÍDO
+    </div>
+
+    <div id="matriculaLeida"
+         class="matricula">
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  let lector = null;
+  let codigoProcesado = false;
+
+
+  function iniciarCamara() {
+
+    codigoProcesado = false;
+
+    document.getElementById('resultado').style.display = 'none';
+
+    if (!lector) {
+      lector = new Html5Qrcode("reader");
+    }
+
+    lector.start(
+      {
+        facingMode: "environment"
+      },
+      {
+        fps: 10,
+        qrbox: {
+          width: 250,
+          height: 250
+        }
+      },
+
+      function(codigo) {
+
+        if (codigoProcesado) {
+          return;
+        }
+
+        codigoProcesado = true;
+
+        const matricula =
+          String(codigo)
+          .trim()
+          .toUpperCase();
+
+        document.getElementById('matriculaLeida')
+          .textContent = matricula;
+
+        document.getElementById('resultado')
+          .style.display = 'block';
+
+        lector.stop()
+          .catch(function() {});
+
+      },
+
+      function() {
+        // Continúa buscando un QR.
+      }
+    )
+
+    .catch(function(error) {
+
+      alert(
+        "No fue posible abrir la cámara.\n\n" +
+        error
+      );
+
+    });
+
+  }
+
+</script>
+
 </body>
 </html>
