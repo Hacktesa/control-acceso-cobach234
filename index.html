@@ -132,7 +132,7 @@
 
   let lector = null;
   let codigoProcesado = false;
-
+const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyQHiSP-r_D_XFUjzUAEMwf4JDITjgvGlfJaajZXz59it62HJdUl4GNxjc2TjxfH0clJw/exec';
 
   function iniciarCamara() {
 
@@ -156,29 +156,75 @@
         }
       },
 
-      function(codigo) {
+     async function(codigo) {
 
-        if (codigoProcesado) {
-          return;
-        }
+  if (codigoProcesado) {
+    return;
+  }
 
-        codigoProcesado = true;
+  codigoProcesado = true;
 
-        const matricula =
-          String(codigo)
-          .trim()
-          .toUpperCase();
+  const matricula =
+    String(codigo)
+      .trim()
+      .toUpperCase();
 
-        document.getElementById('matriculaLeida')
-          .textContent = matricula;
+  // Por ahora probaremos únicamente ENTRADA.
+  const movimiento = 'ENTRADA';
 
-        document.getElementById('resultado')
-          .style.display = 'block';
+  document.getElementById('matriculaLeida')
+    .textContent =
+      'Procesando: ' + matricula;
 
-        lector.stop()
-          .catch(function() {});
+  document.getElementById('resultado')
+    .style.display = 'block';
 
-      },
+  try {
+
+    const url =
+      URL_APPS_SCRIPT +
+      '?matricula=' +
+      encodeURIComponent(matricula) +
+      '&movimiento=' +
+      encodeURIComponent(movimiento);
+
+    const respuesta = await fetch(url);
+
+    const datos = await respuesta.json();
+
+    if (datos.ok) {
+
+      document.getElementById('matriculaLeida')
+        .innerHTML =
+          datos.nombre +
+          '<br><br>' +
+          'Grupo: ' + datos.grupo +
+          '<br>' +
+          datos.fecha + ' · ' + datos.hora +
+          '<br><br>' +
+          '✓ ENTRADA REGISTRADA';
+
+    } else {
+
+      document.getElementById('matriculaLeida')
+        .innerHTML =
+          '⚠ ' + datos.mensaje;
+
+    }
+
+  } catch (error) {
+
+    document.getElementById('matriculaLeida')
+      .innerHTML =
+        '⚠ Error de comunicación con el sistema.';
+
+    console.error(error);
+  }
+
+  lector.stop()
+    .catch(function() {});
+
+},
 
       function() {
         // Continúa buscando un QR.
