@@ -87,7 +87,39 @@
       color: #0b2343;
       word-break: break-word;
     }
+.botonesMovimiento {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
 
+.btnMovimiento {
+  flex: 1;
+  padding: 18px 8px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.entrada {
+  background: #198754;
+}
+
+.salida {
+  background: #dc3545;
+}
+
+.seleccionado {
+  outline: 5px solid #ffc107;
+}
+
+#movimientoActual {
+  margin-bottom: 18px;
+  font-size: 17px;
+  color: #555;
+}
   </style>
 </head>
 
@@ -108,6 +140,25 @@
 
   <button id="btnCamara"
           onclick="iniciarCamara()">
+    <div class="botonesMovimiento">
+
+  <button id="btnEntrada"
+          class="btnMovimiento entrada"
+          onclick="seleccionarMovimiento('ENTRADA')">
+    ENTRADA
+  </button>
+
+  <button id="btnSalida"
+          class="btnMovimiento salida"
+          onclick="seleccionarMovimiento('SALIDA')">
+    SALIDA
+  </button>
+
+</div>
+
+<div id="movimientoActual">
+  Seleccione ENTRADA o SALIDA
+</div>
     📷 ACTIVAR LECTOR QR
   </button>
 
@@ -132,10 +183,41 @@
 
   let lector = null;
   let codigoProcesado = false;
+  let movimientoSeleccionado = '';
 const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyQHiSP-r_D_XFUjzUAEMwf4JDITjgvGlfJaajZXz59it62HJdUl4GNxjc2TjxfH0clJw/exec';
 
+  function seleccionarMovimiento(tipo) {
+
+  movimientoSeleccionado = tipo;
+
+  document.getElementById('btnEntrada')
+    .classList.remove('seleccionado');
+
+  document.getElementById('btnSalida')
+    .classList.remove('seleccionado');
+
+  if (tipo === 'ENTRADA') {
+    document.getElementById('btnEntrada')
+      .classList.add('seleccionado');
+  } else {
+    document.getElementById('btnSalida')
+      .classList.add('seleccionado');
+  }
+
+  document.getElementById('movimientoActual')
+    .innerHTML =
+      'Movimiento seleccionado: <strong>' +
+      tipo +
+      '</strong>';
+}
+  
   function iniciarCamara() {
 
+if (!movimientoSeleccionado) {
+  alert('Primero seleccione ENTRADA o SALIDA.');
+  return;
+}
+    
     codigoProcesado = false;
 
     document.getElementById('resultado').style.display = 'none';
@@ -170,7 +252,7 @@ const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyQHiSP-r_D_XFU
       .toUpperCase();
 
   // Por ahora probaremos únicamente ENTRADA.
-  const movimiento = 'ENTRADA';
+  const movimiento = movimientoSeleccionado;
 
   document.getElementById('matriculaLeida')
     .textContent =
