@@ -223,6 +223,75 @@
   let ultimoEscaneo = 0;
   let movimientoSeleccionado = '';
 
+function sonidoCorrecto() {
+
+  const audioCtx =
+    new (window.AudioContext ||
+         window.webkitAudioContext)();
+
+  const oscilador =
+    audioCtx.createOscillator();
+
+  const ganancia =
+    audioCtx.createGain();
+
+  oscilador.connect(ganancia);
+  ganancia.connect(audioCtx.destination);
+
+  oscilador.frequency.value = 880;
+
+  ganancia.gain.setValueAtTime(
+    0.25,
+    audioCtx.currentTime
+  );
+
+  ganancia.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioCtx.currentTime + 0.25
+  );
+
+  oscilador.start();
+
+  oscilador.stop(
+    audioCtx.currentTime + 0.25
+  );
+}
+
+
+function sonidoError() {
+
+  const audioCtx =
+    new (window.AudioContext ||
+         window.webkitAudioContext)();
+
+  const oscilador =
+    audioCtx.createOscillator();
+
+  const ganancia =
+    audioCtx.createGain();
+
+  oscilador.connect(ganancia);
+  ganancia.connect(audioCtx.destination);
+
+  oscilador.frequency.value = 250;
+
+  ganancia.gain.setValueAtTime(
+    0.30,
+    audioCtx.currentTime
+  );
+
+  ganancia.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioCtx.currentTime + 0.45
+  );
+
+  oscilador.start();
+
+  oscilador.stop(
+    audioCtx.currentTime + 0.45
+  );
+}
+  
   const URL_APPS_SCRIPT =
     'https://script.google.com/macros/s/AKfycbyQHiSP-r_D_XFUjzUAEMwf4JDITjgvGlfJaajZXz59it62HJdUl4GNxjc2TjxfH0clJw/exec';
 
@@ -364,7 +433,9 @@ ultimoEscaneo = ahora;
 
 
           if (datos.ok) {
-
+       
+            sonidoCorrecto();
+            
             document
               .getElementById('matriculaLeida')
               .innerHTML =
@@ -391,6 +462,8 @@ ultimoEscaneo = ahora;
 
           } else {
 
+            sonidoError();
+            
             document
               .getElementById('matriculaLeida')
               .innerHTML =
@@ -401,6 +474,8 @@ ultimoEscaneo = ahora;
 
         } catch (error) {
 
+          sonidoError();
+          
           document
             .getElementById('matriculaLeida')
             .innerHTML =
