@@ -219,6 +219,8 @@
 
   let lector = null;
   let codigoProcesado = false;
+  let ultimoCodigo = '';
+  let ultimoEscaneo = 0;
   let movimientoSeleccionado = '';
 
   const URL_APPS_SCRIPT =
@@ -304,11 +306,22 @@
 
       async function(codigo) {
 
-        if (codigoProcesado) {
-          return;
-        }
+       if (codigoProcesado) {
+  return;
+}
 
-        codigoProcesado = true;
+const ahora = Date.now();
+
+if (
+  codigo === ultimoCodigo &&
+  ahora - ultimoEscaneo < 5000
+) {
+  return;
+}
+
+codigoProcesado = true;
+ultimoCodigo = codigo;
+ultimoEscaneo = ahora;
 
 
         const matricula =
@@ -397,8 +410,15 @@
         }
 
 
-        lector.stop()
-          .catch(function() {});
+       setTimeout(function() {
+
+  codigoProcesado = false;
+
+  document
+    .getElementById('resultado')
+    .style.display = 'none';
+
+}, 3000);
 
       },
 
